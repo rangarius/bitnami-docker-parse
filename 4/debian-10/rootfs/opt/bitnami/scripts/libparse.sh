@@ -73,6 +73,7 @@ parse_validate() {
     check_empty_value "PARSE_APP_NAME"
     ! is_empty_value "$PARSE_ENABLE_HTTPS" && check_yes_no_value "PARSE_ENABLE_HTTPS"
     ! is_empty_value "$PARSE_ENABLE_CLOUD_CODE" && check_yes_no_value "PARSE_ENABLE_CLOUD_CODE"
+    ! is_empty_value "$PARSE_ENABLE_LIVE_QUERY" && check_yes_no_value "PARSE_ENABLE_LIVE_QUERY"
     ! is_empty_value "$PARSE_DATABASE_HOST" && check_resolved_hostname "$PARSE_DATABASE_HOST"
     ! is_empty_value "$PARSE_HOST" && check_resolved_hostname "$PARSE_HOST"
     ! is_empty_value "$PARSE_DATABASE_PORT_NUMBER" && check_valid_port "PARSE_DATABASE_PORT_NUMBER"
@@ -124,7 +125,19 @@ parse_initialize() {
         else
             server_url+="http://"
         fi
-        server_url+="${PARSE_HOST}${PARSE_MOUNT_PATH}"
+        server_url+="${PARSE_HOST}:${PARSE_PORT_NUMBER}${PARSE_MOUNT_PATH}"
+
+        if is_boolean_yes "$PARSE_ENABLE_LIVE_QUERY"; then 
+            info "LIVE_QUERY_ITEMS: $PARSE_LIVE_QUERY_ITEMS"
+            if ! is_empty_value "$PARSE_LIVE_QUERY_ITEMS"; then 
+                local querystring="$PARSE_LIVE_QUERY_ITEMS"
+                parse_conf_set "startLiveQueryServer" true bool
+                parse_conf_set "liveQuery" "$querystring" query
+                
+            else 
+                warn "If PARSE_ENABLED_LIVE_QUERY is set true, you should provide Entries in PARSE_LIVE_QUERY_ITEMS"
+            fi
+        fi
 
         parse_conf_set "serverURL" "$server_url"
         parse_conf_set "databaseURI" "$connection_string"
@@ -167,6 +180,9 @@ parse_conf_set() {
         ;;
     bool)
         jq "(.${key}) |= (\"${value}\" | test(\"true\"))" "$PARSE_CONF_FILE" >"$tempfile"
+        ;;
+    query)
+            jq "(.${key}.classNames) |=  [${value}]" "$PARSE_CONF_FILE" >"$tempfile"
         ;;
     *)
         error "Type unknown: ${type}"

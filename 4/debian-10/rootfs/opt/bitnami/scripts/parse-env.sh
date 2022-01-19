@@ -35,6 +35,8 @@ parse_env_vars=(
     PARSE_DATABASE_NAME
     PARSE_DATABASE_USER
     PARSE_DATABASE_PASSWORD
+    PARSE_ENABLE_LIVE_QUERY
+    PARSE_LIVE_QUERY_ITEMS
     MONGODB_HOST
     MONGODB_PORT_NUMBER
     MONGODB_PORT
@@ -43,6 +45,7 @@ parse_env_vars=(
     MONGODB_DATABASE_USERNAME
     MONGODB_DATABASE_PASSWORD
     MONGODB_PASSWORD
+    
 )
 for env_var in "${parse_env_vars[@]}"; do
     file_env_var="${env_var}_FILE"
@@ -82,7 +85,8 @@ export PARSE_MASTER_KEY="${PARSE_MASTER_KEY:-mymasterKey}"
 export PARSE_APP_NAME="${PARSE_APP_NAME:-parse-server}"
 export PARSE_MOUNT_PATH="${PARSE_MOUNT_PATH:-/parse}"
 export PARSE_ENABLE_CLOUD_CODE="${PARSE_ENABLE_CLOUD_CODE:-no}"
-
+export PARSE_ENABLE_LIVE_QUERY="${PARSE_ENABLE_LIVE_QUERY:-no}"
+export PARSE_LIVE_QUERY_ITEMS="${PARSE_LIVE_QUERY_ITEMS:-}"
 # Database configuration
 export PARSE_DEFAULT_DATABASE_HOST="mongodb" # only used at build time
 PARSE_DATABASE_HOST="${PARSE_DATABASE_HOST:-"${MONGODB_HOST:-}"}"

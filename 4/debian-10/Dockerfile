@@ -1,4 +1,4 @@
-FROM docker.io/bitnami/minideb:buster
+FROM --platform=linux/amd64 docker.io/bitnami/minideb:buster
 LABEL maintainer "Bitnami <containers@bitnami.com>"
 
 ENV HOME="/" \
@@ -23,6 +23,8 @@ ENV BITNAMI_APP_NAME="parse" \
     PATH="/opt/bitnami/python/bin:/opt/bitnami/node/bin:/opt/bitnami/mongodb/bin:/opt/bitnami/mongodb-client/bin:/opt/bitnami/parse/bin:/opt/bitnami/common/bin:$PATH"
 
 EXPOSE 1337 3000
+
+RUN chown -R 1001:1001 /opt/bitnami/
 
 USER 1001
 ENTRYPOINT [ "/opt/bitnami/scripts/parse/entrypoint.sh" ]
